@@ -1,1 +1,1 @@
-# cs155-hmm
+# Caltech CS 155 Miniproject 2: ShakespeareBot
