@@ -9,12 +9,45 @@ from utils import syl_count
 
 d_pronoun = cmudict.dict()
 
-def split_file(filename):
+def split_sonnets(filename):
+    """
+    Tokenizes the file and returns a list of tokens for
+    each sonnet in the file. (Doesn't look like it's needed 
+    since splitting by lines is easier and works as well)
+    """
+    # Keep apostrophes and hyphens in a word 
+    tokenizer = RegexpTokenizer('[\w|\'|-]+') 
+
+    sonnets = []
+    with open(filename) as f:
+        sonnet = []
+        sonnetBegin = False
+        
+        for line in f:
+            line = line.strip()
+            if (line.isdigit()):
+                sonnetBegin = True
+                continue
+            if (len(line) > 0):
+                line = line.lower()
+                tokens = tokenizer.tokenize(line)
+                
+                sonnet.extend(tokens)
+            if len(line) == 0:
+                if sonnetBegin:
+                    sonnets.append(sonnet)
+                    sonnet = []
+                    sonnetBegin = False
+
+    return sonnets
+
+
+def split_lines(filename):
     """
     Tokenizes the file and returns a list of tokens for
     each line of poetry in the file.
     """
-    # keep apostrophes and hyphens
+    # Keep apostrophes and hyphens
     tokenizer = RegexpTokenizer('[\w|\'|-]+') 
 
     line_tokens = []
@@ -73,7 +106,7 @@ def parse_line(line):
 if __name__=='__main__':
     filename = 'data/shakespeare.txt'
     
-    line_tokens = split_file(filename)
+    line_tokens = split_lines(filename)
     
     meter = {}
     rhyme = {}

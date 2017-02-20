@@ -1,6 +1,4 @@
 import re
-import string
-
 
 def syl_count(word):
     """
