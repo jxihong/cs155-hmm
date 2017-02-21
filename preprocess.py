@@ -65,52 +65,81 @@ def split_lines(filename):
     return line_tokens
 
 
+def parse_rhyme(word):
+    """
+    Parses each word in a line for rhyme.
+    """
+    k = ''
+    try:
+        pronounciation = d_pronoun[word][-1]
+        k = ','.join(pronounciation[-2:])
+        
+    except (KeyError):
+        # Can't do anything if word is not in dictionary
+        pass
+
+    return word, k
+    
+
 def parse_line(line):
     """
-    Parses each word in a line of a sonnet for rhyme and meter
+    Parses each word in a line of a sonnet for rhyme and meter. (Assumes
+    iambic pentameter).
     """
     def syl(pronunciation):
         """
         Helper function to find number of syllables given cmudict pronounciation
         """
-        return len([i[-1] for i in pronunciation if \
-                i[-1].isdigit()])
-    
+        stress = [i[-1] for i in pronunciation if \
+                      i[-1].isdigit()]
+        
+        # Get rid of secondary stress, need only stressed and unstressed
+        for i in xrange(len(stress)):
+            if stress[i] == '2':
+                stress[i] = '1'
+        return stress
+
     tot = 0
     for word in line:
         sk = ''
         ml = ''
         
         try:
-            pronounciation = d_pronoun[word][0]
-            s = syl(pronounciation)
+            pronounciation = d_pronoun[word][-1]
+            stress = syl(pronounciation)
+
+            s = len(stress)
+            mk = ','.join(stress)
             
-            sk = ','.join(pronounciation[-2:])
         except (KeyError):
+            # Manually count syllables if not in dictionary
             s = syl_count(word)
         
-        stress = []
-        for i in xrange(s):
-            if (tot + i) % 2 == 0:
-                stress.append(0)
-            else:
-                stress.append(1)
+            stress = []
+            for i in xrange(s):
+                if (tot + i) % 2 == 0:
+                    stress.append(0)
+                else:
+                    stress.append(1)
+
+            mk = ','.join(str(i) for i in stress)
+
+        sk = parse_rhyme(word)[1]
         
-        mk = ','.join(str(i) for i in stress)
-        
-        tot += s                
-        
+        tot += s                        
         yield word, sk, mk
         
 
 if __name__=='__main__':
-    filename = 'data/shakespeare.txt'
+    files = ['data/shakespeare.txt', 'data/shakespeare_xtra.txt']
     
-    line_tokens = split_lines(filename)
-    
+    line_tokens = []
+    for filename in files:
+        line_tokens.extend(split_lines(filename))
+
     meter = {}
     rhyme = {}
-    vocab = set()
+    seen = set()
     
     for line in line_tokens:
         for word, sk, mk in parse_line(line):
@@ -130,10 +159,12 @@ if __name__=='__main__':
                     meter[mk] = set()
                     meter[mk].add(word)
                     
-            vocab.add(word) # Save word
+            seen.add(word) # Save word
 
     # Convert all the sets to lists, since sets aren't serializable
-    vocab = list(vocab)
+    seen = list(seen)
+    vocab = dict((i, c) for i, c in enumerate(seen))
+    inverted_vocab = dict((c, i) for i, c in enumerate(seen))
 
     for k, v in rhyme.items():
         rhyme[k] = list(v)
@@ -143,7 +174,10 @@ if __name__=='__main__':
 
     with open('models/shakespeare_vocab.json', 'w') as f:
         json.dump(vocab, f)
-        
+    
+    with open('models/shakespeare_inverted_vocab.json', 'w') as f:
+        json.dump(inverted_vocab, f)
+
     with open('models/shakespeare_rhyme.json', 'w') as f:
         json.dump(rhyme, f)
         

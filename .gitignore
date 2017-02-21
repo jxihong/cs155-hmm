@@ -8,5 +8,5 @@
 *.DS_Store
 
 # Data Files
-data/shakespeare.txt
-data/spenser.txt
+data/shakespeare*.txt
+data/spenser*
