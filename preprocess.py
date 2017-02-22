@@ -5,7 +5,7 @@ import json
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import cmudict
 
-from utils import syl_count
+from utils import syl_count, invert_map
 
 d_pronoun = cmudict.dict()
 
@@ -79,9 +79,26 @@ def parse_rhyme(word):
         pass
 
     return word, k
+
     
 
-def parse_line(line):
+def parse_pos(line):
+    """
+    Parses words for the part-of-speech
+    """
+    tags = nltk.pos_tag(line)
+    
+    for tag in tags:
+        word = tag[0]
+        tag = tag[1][:2]
+
+        if word == "i":
+            tag = 'PR'
+        
+        yield word, tag
+
+    
+def parse_words(line):
     """
     Parses each word in a line of a sonnet for rhyme and meter. (Assumes
     iambic pentameter).
@@ -139,10 +156,11 @@ if __name__=='__main__':
 
     meter = {}
     rhyme = {}
+    pos = {}
     seen = set()
     
     for line in line_tokens:
-        for word, sk, mk in parse_line(line):
+        for word, sk, mk in parse_words(line):
             # Save meter of word
             if len(sk) > 0:
                 if sk in rhyme.keys():
@@ -160,7 +178,15 @@ if __name__=='__main__':
                     meter[mk].add(word)
                     
             seen.add(word) # Save word
-
+    
+    for line in line_tokens:
+        for word, tag in parse_pos(line):
+            if tag in pos.keys():
+                pos[tag].add(word)
+            else:
+                pos[tag] = set()
+                pos[tag].add(word)
+            
     # Convert all the sets to lists, since sets aren't serializable
     seen = list(seen)
     vocab = dict((i, c) for i, c in enumerate(seen))
@@ -168,18 +194,32 @@ if __name__=='__main__':
 
     for k, v in rhyme.items():
         rhyme[k] = list(v)
-
     for k, v in meter.items():
         meter[k] = list(v)
-
+    for k,v in pos.items():
+        pos[k] = list(v)
+    
+    # Create inverse mappings to lookup words
+    inverted_rhyme = invert_map(rhyme)
+    inverted_meter = invert_map(meter)
+    inverted_pos = invert_map(pos)
+    
     with open('models/shakespeare_vocab.json', 'w') as f:
         json.dump(vocab, f)
-    
     with open('models/shakespeare_inverted_vocab.json', 'w') as f:
         json.dump(inverted_vocab, f)
-
+    
     with open('models/shakespeare_rhyme.json', 'w') as f:
         json.dump(rhyme, f)
-        
+    with open('models/shakespeare_inverted_rhyme.json', 'w') as f:
+        json.dump(inverted_rhyme, f)
+    
     with open('models/shakespeare_meter.json', 'w') as f:
         json.dump(meter, f)
+    with open('models/shakespeare_inverted_meter.json', 'w') as f:
+        json.dump(inverted_meter, f)
+    
+    with open('models/shakespeare_pos.json', 'w') as f:
+        json.dump(pos, f)
+    with open('models/shakespeare_inverted_pos.json', 'w') as f:
+        json.dump(inverted_pos, f)

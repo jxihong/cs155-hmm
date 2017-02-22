@@ -1,7 +1,6 @@
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM
-from keras import backend as K
 
 import tensorflow as tf
 import numpy as np
@@ -23,11 +22,16 @@ def build_model(window, len_chars):
     
     return model
 
+
 def sample(preds, temperature=1.0):
-    # helper function to sample an index from a probability array
+    # Helper function to sample an index from a probability array
     preds = np.asarray(preds).astype('float64')
-    preds = np.log(preds) / temperature
     
+    preds = np.log(preds) / temperature
+        
+    # Fix division by 0
+    preds[preds == np.inf] = 0
+
     exp_preds = np.exp(preds)
     preds =  exp_preds / np.sum(exp_preds)
     
@@ -82,16 +86,16 @@ if __name__ == '__main__':
         print('Iteration', iteration)
         model.fit(X, y, batch_size=128, nb_epoch=1)
 
-        generated = '$'*17 + 'love is '
-        sentence = generated
-        
-        print('----- Generating with start: %s \n' %generated)
 
         for diversity in [0.2, 0.5, 1.0]:
             print
             print('----- Diversity:', diversity)
-
-            sys.stdout.write(generated[17:])
+            
+            generated = 'love is '
+            sentence = '$' * 17 + generated
+        
+            print('----- Generating with start: %s \n' %generated)
+            sys.stdout.write(generated)
             for i in range(150):
                 x = np.zeros((1, maxlen, len(chars)))
                 for t, char in enumerate(sentence):
@@ -104,7 +108,6 @@ if __name__ == '__main__':
                 generated += next_char
                 sentence = sentence[1:] + next_char
 
-                if (next_char != '$'):
-                    sys.stdout.write(next_char)
-                    sys.stdout.flush()
+                sys.stdout.write(next_char)
+                sys.stdout.flush()
             print

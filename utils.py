@@ -59,3 +59,14 @@ def syl_count(word):
         disc += 1
         
     return numVowels - disc + syls
+
+
+def invert_map(d):
+    """
+    Invert a dictionary of lists, where lists contain non-unique items.
+    """
+    inverse = {}
+    for k in d:
+        for v in d[k]:
+            inverse.setdefault(v, []).append(k)
+    return inverse
