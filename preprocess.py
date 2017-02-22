@@ -4,6 +4,7 @@ import json
 
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import cmudict
+from nltk.util import ngrams
 
 from utils import syl_count, invert_map
 
@@ -64,6 +65,32 @@ def split_lines(filename):
 
     return line_tokens
 
+
+def split_lines_ngrams(filename, n=2):
+    """
+    Tokenizes file and returns a list of ngrams of tokens
+    for each line.
+    """
+    # Keep apostrophes and hyphens
+    tokenizer = RegexpTokenizer('[\w|\'|-]+') 
+
+    line_tokens = []
+    with open(filename) as f:
+        line = []
+        for line in f:
+            line = line.strip()
+            if (line.isdigit()):
+                continue
+            if (len(line) > 0):
+                line = line.lower()
+                tokens = tokenizer.tokenize(line)
+                
+                for ngram in ngrams(tokens, n):
+                    line.append(list(ngram))
+                line_tokens.append(line)
+
+    return line_tokens
+    
 
 def parse_rhyme(word):
     """
