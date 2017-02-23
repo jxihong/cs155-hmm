@@ -136,10 +136,43 @@ class BackwardsSonnetHMM:
         ends = []
         for word in w:
             stresses = self.inverted_meter[word][0].split(',')
+            
+            if word not in self.inverted_rhyme:
+                continue
             if (stresses[-1] == '1'):
                 ends.append(word)
     
         return np.random.choice(ends)
+
+
+    def end_next_rhyme(self, prev_rhyme):
+        """
+        Find the next end word given previous, and a word that must rhyme 
+        with it.
+        """
+        ending = self.inverted_rhyme[prev_rhyme][0]
+        
+        rhymes = self.rhyme[ending]
+
+        max_similarity = 0.
+        best_word = prev_rhyme
+        for rhyme in rhymes:
+            if rhyme == prev_rhyme:
+                continue
+            stresses = self.inverted_meter[rhyme][0].split(',')
+            if stresses[-1] == '0':
+                continue
+            
+            try:
+                sim = self.word2vec.similarity(prev_rhyme, rhyme)
+                if sim > max_similarity:
+                    best_word = rhyme
+                    max_similarity = sim
+            except KeyError:
+                if best_word == prev_rhyme:
+                    best_word = rhyme
+
+        return best_word
 
 
     def generate_sonnet(self, end_word=None):
@@ -169,6 +202,43 @@ class BackwardsSonnetHMM:
         return sonnet
 
 
+    def generate_sonnet_rhyme(self, end_word=None):
+        """
+        Generate a 14 line sonnet.
+        """
+        # Encodes abab cdcd efef gg rhyme scheme 
+        rhyme_scheme = {2:0, 3:1, 6:4, 7:5, 10:8, 11:9, 13:12}
+        
+        if not end_word:
+            ends = []
+            for k in self.meter.keys():
+                m = map(int, k.split(','))
+                if m[-1] == 1:
+                    ends.extend([w for w in self.meter[k]])
+            end_word = np.random.choice(ends)
+
+        sonnet = ''
+        end_words = []
+        for i in xrange(14):
+            line = self.generate_line(end_word)
+            end_word = line[-1]
+            end_words.append(end_word) # Add to list of end words
+
+            sonnet += ' '.join(line)
+            if ((i + 1) % 4 == 0) or (i == 13):
+                sonnet += '.\n'
+            else:
+                sonnet += ',\n'
+            
+            if (i + 1) in rhyme_scheme:
+                end_word = self.end_next_rhyme( \
+                    end_words[rhyme_scheme[i + 1]])
+            else:
+                end_word = self.end_next(end_word)
+
+        return sonnet
+
+
 if __name__ == '__main__':
     model = joblib.load('../models/backwards_hmm_50.pkl')
     
@@ -179,3 +249,4 @@ if __name__ == '__main__':
     hmm = BackwardsSonnetHMM(A, O, A_start)
     
     print hmm.generate_sonnet("love")
+    print hmm.generate_sonnet_rhyme("love")
