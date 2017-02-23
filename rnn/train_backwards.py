@@ -84,8 +84,8 @@ if __name__=='__main__':
             
     # serialize model to JSON
     model_json = model.to_json()
-    with open("../models/char_rnn.json", "w") as json_file:
+    with open("../models/backwards_char_rnn.json", "w") as json_file:
         json_file.write(model_json)
     # serialize weights to HDF5
-    model.save_weights("../models/char_rnn.h5")
+    model.save_weights("../models/backwards_char_rnn.h5")
     print "Saved model to disk"
