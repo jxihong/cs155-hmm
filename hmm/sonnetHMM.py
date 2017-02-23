@@ -74,7 +74,18 @@ class BackwardsSonnetHMM:
         
             if len(m) + num_syllables > 10:
                 invalid.extend([self.inverted_vocab[w] for w in self.meter[k]])
-            
+
+        # grammar rules
+        for k in self.pos.keys():
+            # do a few cases to implement some basic grammar rules. note this is 
+            # training backwards so the rules are a little weird.
+            # need to multiply parts of speech by probability transition matrix?
+            # requires tagging a POS with cmu nltk pos_tag
+            if "NN" in self.inverted_pos[prev_word]:
+                for k in self.pos.keys():
+                    if k in ["NN",]:
+                        invalid.extend([self.inverted_vocab[w] for w in self.pos[k]])
+
         
         new_probs[invalid] = 0
         with np.errstate(divide='ignore'):
