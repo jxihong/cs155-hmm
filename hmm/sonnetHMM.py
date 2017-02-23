@@ -165,8 +165,8 @@ class BackwardsSonnetHMM:
         
         rhymes = self.rhyme[ending]
 
-        max_similarity = 0.
-        best_word = prev_rhyme
+        threshold_similarity = 0.05
+        best_words = []
         for rhyme in rhymes:
             if rhyme == prev_rhyme:
                 continue
@@ -176,14 +176,17 @@ class BackwardsSonnetHMM:
             
             try:
                 sim = self.word2vec.similarity(prev_rhyme, rhyme)
-                if sim > max_similarity:
-                    best_word = rhyme
-                    max_similarity = sim
+                if sim > threshold_similarity:
+                    best_words.append(rhyme)
+            
             except KeyError:
-                if best_word == prev_rhyme:
-                    best_word = rhyme
+                # probably a stopword
+                best_words.append(rhyme)
 
-        return best_word
+        if len(best_words) == 0:
+            return prev_rhyme
+
+        return np.random.choice(best_words)
 
 
     def generate_sonnet(self, end_word=None):
@@ -194,8 +197,10 @@ class BackwardsSonnetHMM:
             ends = []
             for k in self.meter.keys():
                 m = map(int, k.split(','))
+
                 if m[-1] == 1:
-                    ends.extend([w for w in self.meter[k]])
+                    ends.extend([w for w in self.meter[k] and \
+                                     w in self.inverted_rhyme])
             end_word = np.random.choice(ends)
 
         sonnet = ''
@@ -225,7 +230,8 @@ class BackwardsSonnetHMM:
             for k in self.meter.keys():
                 m = map(int, k.split(','))
                 if m[-1] == 1:
-                    ends.extend([w for w in self.meter[k]])
+                    ends.extend([w for w in self.meter[k] and \
+                                     w in self.inverted_rhyme])
             end_word = np.random.choice(ends)
 
         sonnet = ''
