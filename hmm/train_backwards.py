@@ -21,12 +21,14 @@ if __name__ == '__main__':
     
     print('Number sequences:', len(lines))
     
-    vocab = json.load(open('../models/shakespeare_words/shakespeare_vocab.json'))
+    vocab = json.load( \
+        open('../models/shakespeare_words/shakespeare_vocab.json'))
     # Change to integer keys
     for k in vocab.keys():
         vocab[int(k)] = vocab.pop(k)
         
-    inverted_vocab = json.load(open('../models/shakespeare_words/shakespeare_inverted_vocab.json'))
+    inverted_vocab = json.load( \
+        open('../models/shakespeare_words/shakespeare_inverted_vocab.json'))
     
     X = np.concatenate([[inverted_vocab[x] for x in lines[i]] \
                             for i in range(len(lines))])
@@ -34,13 +36,13 @@ if __name__ == '__main__':
     X = X.reshape(-1, 1) # Need column vector
     lengths = np.array([len(line) for line in lines])
     
-    model = hmm.MultinomialHMM(n_components=10, n_iter=1000, verbose=True)
+    model = hmm.MultinomialHMM(n_components=100, n_iter=1000, verbose=True)
 
     with np.errstate(divide='ignore'):
         model.fit(X, lengths)
         print
 
-    joblib.dump(model, "backwards_hmm_10.pkl")
+    joblib.dump(model, "../models/backwards_hmm_100.pkl")
     print 'Saved model to disk'
     print
 

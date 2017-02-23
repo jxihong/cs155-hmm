@@ -1,12 +1,13 @@
 import string
+import random
 import re
 
-def syl_count(word):
+def syl_count(w):
     """
     Roughly counts the number of syllables in a word (use when 
     NLTK cannot find word in its vocabulary.
     """
-    word = word.lower()
+    word = w.lower()
     word = word.translate(None, string.punctuation)
     
     syls = 0 #added syllable number
@@ -58,7 +59,7 @@ def syl_count(word):
     if word[:5] == "where":
         disc += 1
         
-    return numVowels - disc + syls
+    return max(numVowels - disc + syls, 1)
 
 
 def invert_map(d):
@@ -70,3 +71,18 @@ def invert_map(d):
         for v in d[k]:
             inverse.setdefault(v, []).append(k)
     return inverse
+
+
+def random_pick(l, probs):
+    """ 
+    Probabilistic random picking according
+    to a probability distribution
+    """
+    x = random.uniform(0, 1)
+    cumulative_probability = 0.0
+
+    for item, prob in zip(l, probs):
+        cumulative_probability += prob
+        if x < cumulative_probability: 
+            break
+    return item

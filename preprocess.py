@@ -146,7 +146,7 @@ def parse_words(line):
     tot = 0
     for word in line:
         sk = ''
-        ml = ''
+        mk = ''
         
         try:
             pronounciation = d_pronoun[word][-1]
