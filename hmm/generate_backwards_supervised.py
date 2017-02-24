@@ -22,7 +22,7 @@ if __name__ == '__main__':
                 line = line[:-1]
                 for word in line.split(' '):
                     try:
-                        print word, hmm.inverted_pos[word][0]
+                        print word#, hmm.inverted_pos[word][0]
                     except:
                         continue
             break
