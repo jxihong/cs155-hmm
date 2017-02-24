@@ -361,7 +361,7 @@ def supervised_learning(X, Y, hidden, obs):
 
 
 if __name__ == '__main__':
-    model = joblib.load('../models/backwards_hmm_10.pkl')
+    model = joblib.load('../models/backwards_hmm_30.pkl')
     
     A = model.transmat_
     O = model.emissionprob_
@@ -372,7 +372,7 @@ if __name__ == '__main__':
     while True:
         try:
             seed = np.random.choice(hmm.inverted_rhyme.keys())
-            sonnet = hmm.generate_sonnet_rhyme(seed)
+            sonnet = hmm.generate_sonnet(seed)
             
             print sonnet
             break

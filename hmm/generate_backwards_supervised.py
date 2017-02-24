@@ -17,14 +17,14 @@ if __name__ == '__main__':
             sonnet = hmm.generate_sonnet_rhyme(seed)
 
             print sonnet
-            lines = sonnet.split("\n")
-            for line in lines:
-                line = line[:-1]
-                for word in line.split(' '):
-                    try:
-                        print word#, hmm.inverted_pos[word][0]
-                    except:
-                        continue
+            #lines = sonnet.split("\n")
+            #for line in lines:
+            #    line = line[:-1]
+            #    for word in line.split(' '):
+            #        try:
+            #            print word, hmm.inverted_pos[word][0]
+            #        except:
+            #            continue
             break
         except:
             continue

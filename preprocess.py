@@ -176,8 +176,8 @@ def parse_words(line):
         
 
 if __name__=='__main__':
-    files = ['data/shakespeare.txt', 'data/shakespeare_xtra.txt', \
-                 'data/spenser.txt']
+    files = ['data/shakespeare.txt', 'data/shakespeare_xtra.txt']
+                 #'data/spenser.txt']
     
     line_tokens = []
     for filename in files:
@@ -233,22 +233,22 @@ if __name__=='__main__':
     inverted_meter = invert_map(meter)
     inverted_pos = invert_map(pos)
     
-    with open('models/words/vocab.json', 'w') as f:
+    with open('models/shakespeare_words/vocab.json', 'w') as f:
         json.dump(vocab, f)
-    with open('models/words/inverted_vocab.json', 'w') as f:
+    with open('models/shakespeare_words/inverted_vocab.json', 'w') as f:
         json.dump(inverted_vocab, f)
     
-    with open('models/words/rhyme.json', 'w') as f:
+    with open('models/shakespeare_words/rhyme.json', 'w') as f:
         json.dump(rhyme, f)
-    with open('models/words/inverted_rhyme.json', 'w') as f:
+    with open('models/shakespeare_words/inverted_rhyme.json', 'w') as f:
         json.dump(inverted_rhyme, f)
     
-    with open('models/words/meter.json', 'w') as f:
+    with open('models/shakespeare_words/meter.json', 'w') as f:
         json.dump(meter, f)
-    with open('models/words/inverted_meter.json', 'w') as f:
+    with open('models/shakespeare_words/inverted_meter.json', 'w') as f:
         json.dump(inverted_meter, f)
     
-    with open('models/words/pos.json', 'w') as f:
+    with open('models/shakespeare_words/pos.json', 'w') as f:
         json.dump(pos, f)
-    with open('models/words/inverted_pos.json', 'w') as f:
+    with open('models/shakespeare_words/inverted_pos.json', 'w') as f:
         json.dump(inverted_pos, f)
