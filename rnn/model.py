@@ -25,15 +25,16 @@ def build_model(window, len_chars):
 
 def sample(preds, temperature=1.0):
     # Helper function to sample an index from a probability array
-    preds = np.asarray(preds).astype('float64')
+    with np.errstate(divide='ignore'):
+        preds = np.asarray(preds).astype('float64')
     
-    preds = np.log(preds) / temperature
+        preds = np.log(preds) / temperature
         
-    # Fix division by 0
-    preds[preds == np.inf] = 0
+        # Fix division by 0
+        preds[preds == np.inf] = 0
 
-    exp_preds = np.exp(preds)
-    preds =  exp_preds / np.sum(exp_preds)
+        exp_preds = np.exp(preds)
+        preds =  exp_preds / np.sum(exp_preds)
     
     return np.argmax(np.random.multinomial(1, preds, 1))
 

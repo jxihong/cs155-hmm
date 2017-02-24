@@ -11,7 +11,8 @@ import pickle
 from model import build_model, sample
 
 if __name__=='__main__':
-    files = ['../data/shakespeare.txt', '../data/shakespeare_xtra.txt']
+    files = ['../data/shakespeare.txt', '../data/shakespeare_xtra.txt', \
+                 '../data/spenser.txt']
     text = ''
 
     for filename in files:
@@ -19,7 +20,7 @@ if __name__=='__main__':
             for line in f:
                 line = line.strip()
                 if len(line) > 0 and not line.isdigit():
-                    line = line.translate(None, ':;,.!()?')
+                    line = line.translate(None, ':;,.!()?&')
                     text += '$' + line.lower() + '\n'
 
     chars = set(text)

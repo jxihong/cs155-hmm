@@ -17,7 +17,7 @@ def split_sonnets(filename):
     since splitting by lines is easier and works as well)
     """
     # Keep apostrophes and hyphens in a word 
-    tokenizer = RegexpTokenizer('[\w|\'|-]+') 
+    tokenizer = RegexpTokenizer('\w[\w|\'|-]*\w|\w') 
 
     sonnets = []
     with open(filename) as f:
@@ -49,7 +49,7 @@ def split_lines(filename):
     each line of poetry in the file.
     """
     # Keep apostrophes and hyphens
-    tokenizer = RegexpTokenizer('[\w|\'|-]+') 
+    tokenizer = RegexpTokenizer('\w[\w|\'|-]*\w|\w') 
 
     line_tokens = []
     with open(filename) as f:
@@ -61,7 +61,8 @@ def split_lines(filename):
                 line = line.lower()
                 tokens = tokenizer.tokenize(line)
                 
-                line_tokens.append(tokens)
+                if len(tokens) > 1:
+                    line_tokens.append(tokens)
 
     return line_tokens
 
@@ -72,7 +73,7 @@ def split_lines_ngrams(filename, n=2):
     for each line.
     """
     # Keep apostrophes and hyphens
-    tokenizer = RegexpTokenizer('[\w|\'|-]+') 
+    tokenizer = RegexpTokenizer('\w[\w|\'|-]*\w|\w') 
 
     line_tokens = []
     with open(filename) as f:
@@ -117,7 +118,7 @@ def parse_pos(line):
     
     for tag in tags:
         word = tag[0]
-        tag = tag[1][:2]
+        tag = tag[1]
 
         if word == "i":
             tag = 'PR'
@@ -175,7 +176,8 @@ def parse_words(line):
         
 
 if __name__=='__main__':
-    files = ['data/shakespeare.txt', 'data/shakespeare_xtra.txt']
+    files = ['data/shakespeare.txt', 'data/shakespeare_xtra.txt', \
+                 'data/spenser.txt']
     
     line_tokens = []
     for filename in files:
@@ -231,22 +233,22 @@ if __name__=='__main__':
     inverted_meter = invert_map(meter)
     inverted_pos = invert_map(pos)
     
-    with open('models/shakespeare_vocab.json', 'w') as f:
+    with open('models/words/vocab.json', 'w') as f:
         json.dump(vocab, f)
-    with open('models/shakespeare_inverted_vocab.json', 'w') as f:
+    with open('models/words/inverted_vocab.json', 'w') as f:
         json.dump(inverted_vocab, f)
     
-    with open('models/shakespeare_rhyme.json', 'w') as f:
+    with open('models/words/rhyme.json', 'w') as f:
         json.dump(rhyme, f)
-    with open('models/shakespeare_inverted_rhyme.json', 'w') as f:
+    with open('models/words/inverted_rhyme.json', 'w') as f:
         json.dump(inverted_rhyme, f)
     
-    with open('models/shakespeare_meter.json', 'w') as f:
+    with open('models/words/meter.json', 'w') as f:
         json.dump(meter, f)
-    with open('models/shakespeare_inverted_meter.json', 'w') as f:
+    with open('models/words/inverted_meter.json', 'w') as f:
         json.dump(inverted_meter, f)
     
-    with open('models/shakespeare_pos.json', 'w') as f:
+    with open('models/words/pos.json', 'w') as f:
         json.dump(pos, f)
-    with open('models/shakespeare_inverted_pos.json', 'w') as f:
+    with open('models/words/inverted_pos.json', 'w') as f:
         json.dump(inverted_pos, f)
