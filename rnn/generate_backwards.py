@@ -161,7 +161,7 @@ if __name__=='__main__':
             end_words[i] = end_next(end_words[i + 1])
             
     sentence = ''
-    diversity = 0.5
+    diversity = 0.2
     sonnet = ''
     for i in xrange(13, -1, -1):
         line = generated
